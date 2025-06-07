@@ -91,8 +91,8 @@ function initializeChart() {
             ]
         },
         options: {
-            responsive: true, // Make chart responsive
-            maintainAspectRatio: false, // Allow height control via CSS
+            responsive: true, // Keep responsive so it resizes with screen width
+            maintainAspectRatio: false, // <--- THIS IS IMPORTANT: Let CSS control height
             scales: {
                 y: {
                     beginAtZero: false // Adjust as needed based on expected sensor values

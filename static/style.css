@@ -11,13 +11,27 @@ h1 {
     text-align: center;
 }
 
-#myChart {
-    max-width: 800px; /* Adjust max-width as needed */
-    margin: 20px auto; /* Center the chart */
+.chart-container { /* Style the new container div */
+    position: relative; /* Needed for some Chart.js features if you add tooltips etc. */
+    max-width: 800px; /* Control the max width */
+    height: 400px; /* Set a fixed height */
+    /* OR */
+    /* max-height: 400px; */ /* Set a max height */
+    /* OR */
+    /* height: 50vh; */ /* Set height relative to viewport height */
+
+    margin: 20px auto; /* Center the container */
     background-color: #fff;
     padding: 15px;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#myChart {
+   /* The canvas itself can inherit dimensions from the container */
+   /* You might not need explicit width/height attributes on the canvas element itself */
+   width: 100% !important; /* Important can help override default canvas sizing */
+   height: 100% !important; /* Important can help override default canvas sizing */
 }
 
 #stats {
