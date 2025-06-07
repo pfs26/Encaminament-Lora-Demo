@@ -1,0 +1,4 @@
+fastapi
+uvicorn[standard]  # ASGI server, [standard] includes websockets support
+websockets         # Explicit dependency, often pulled by uvicorn[standard]
+python-multipart   # For parsing form data (TTN usually sends JSON, but good to have)
