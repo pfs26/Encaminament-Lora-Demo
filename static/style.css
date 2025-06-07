@@ -1,0 +1,115 @@
+body {
+    font-family: sans-serif;
+    line-height: 1.6;
+    margin: 20px;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+h1 {
+    color: #0056b3;
+    text-align: center;
+}
+
+#myChart {
+    max-width: 800px; /* Adjust max-width as needed */
+    margin: 20px auto; /* Center the chart */
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#stats {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 15px;
+    background-color: #e9e9e9;
+    border-left: 4px solid #007bff;
+    border-radius: 4px;
+}
+
+#stats h3 {
+    margin-top: 0;
+    color: #0056b3;
+}
+
+#rawData {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 15px;
+    background-color: #282c34; /* Dark background */
+    color: #abb2bf; /* Light text */
+    font-family: monospace;
+    white-space: pre-wrap; /* Wrap long lines */
+    word-wrap: break-word;
+    border-radius: 4px;
+    overflow-x: auto; /* Add scrollbar if content is too wide */
+}
+
+/* Simple responsive adjustment */
+@media (max-width: 600px) {
+    #myChart, #stats, #rawData {
+        margin-left: 10px;
+        margin-right: 10px;
+        padding: 10px;
+    }
+}
+
+/* Add this to your existing style.css */
+
+#dataGrid {
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#dataGrid h3 {
+    margin-top: 0;
+    color: #0056b3;
+}
+
+#dataGrid table {
+    width: 100%;
+    border-collapse: collapse; /* Remove space between borders */
+    margin-top: 10px;
+}
+
+#dataGrid th, #dataGrid td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+#dataGrid th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    color: #555;
+}
+
+/* Optional: Zebra striping for rows */
+#dataGrid tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+#dataGrid tbody tr:hover {
+    background-color: #e9e9e9;
+}
+
+/* Scrollable table body - tricky with fixed header purely in CSS, JS is better */
+/* But for this MVP, simple scroll is fine if needed */
+/*
+#dataGrid table tbody {
+    display: block;
+    max-height: 300px; // Set a max height
+    overflow-y: auto; // Add vertical scrollbar
+}
+#dataGrid table thead tr {
+    display: table; // Make header match body width
+    width: 100%;
+    table-layout: fixed; // Ensure columns align
+}
+*/
