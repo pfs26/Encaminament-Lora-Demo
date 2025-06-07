@@ -3,6 +3,7 @@ const rawDataElement = document.getElementById('rawData');
 const statsElement = document.getElementById('stats');
 const latestReading1Element = document.getElementById('latestReading1');
 const latestReading2Element = document.getElementById('latestReading2'); // Add more if needed
+const latestReading3Element = document.getElementById('latestReading3'); // Add more if needed
 const dataGridBody = document.querySelector('#dataGrid tbody');
 
 let chart;
@@ -42,11 +43,12 @@ socket.onmessage = (event) => {
             if (Array.isArray(transportData) && transportData.length >= 3) { // Need at least 3 elements (2 headers + 1 reading)
                 const sensorReading1 = transportData[2];
                 const sensorReading2 = transportData.length > 3 ? transportData[3] : null; // Check if there's a 4th element
+                const sensorReading3 = transportData.length > 4 ? transportData[4] : null; // Check if there's a 4th element
 
                 // --- Update UI ---
-                updateChart([sensorReading1, sensorReading2].filter(val => val !== null)); // Filter out null if only one reading
-                updateStats([sensorReading1, sensorReading2].filter(val => val !== null));
-                addDataGridRow([sensorReading1, sensorReading2].filter(val => val !== null));
+                updateChart([sensorReading1, sensorReading2, sensorReading3]); 
+                updateStats([sensorReading1, sensorReading2, sensorReading3]);
+                addDataGridRow([sensorReading1, sensorReading2, sensorReading3]);
 
             } else {
                 console.warn("Payload does not contain expected transport.data array with enough elements:", decodedPayload);
@@ -86,8 +88,15 @@ function initializeChart() {
                 borderColor: 'rgb(54, 162, 235)',
                 tension: 0.1,
                 fill: false // Don't fill area under the line
-            }
+            },
             // Add more datasets here for more sensors
+            {
+                label: 'Sensor Reading 3',
+                data: [],
+                borderColor: 'rgb(0, 255, 76)',
+                tension: 0.1,
+                fill: false // Don't fill area under the line
+            }
             ]
         },
         options: {
@@ -98,14 +107,6 @@ function initializeChart() {
                     beginAtZero: false // Adjust as needed based on expected sensor values
                 },
                 x: {
-                     // Example: configure x-axis for time-based data if you want more precision
-                     // type: 'time',
-                     // time: {
-                     //    unit: 'second'
-                     // },
-                     // ticks: {
-                     //    source: 'auto'
-                     // }
                 }
             },
             plugins: {
@@ -136,6 +137,7 @@ function updateChart(readings) {
     if (readings.length > 0) chart.data.datasets[0].data.push(readings[0]);
     if (readings.length > 1) chart.data.datasets[1].data.push(readings[1]);
     // Add logic for more datasets if needed
+    if (readings.length > 2) chart.data.datasets[2].data.push(readings[2]);
 
     // Limit the number of data points on the chart
     if (chart.data.labels.length > MAX_CHART_DATA_POINTS) {
@@ -153,6 +155,9 @@ function updateStats(readings) {
      if (readings.length > 1) latestReading2Element.textContent = `Sensor Reading 2: ${readings[1]}`;
      else latestReading2Element.textContent = `Sensor Reading 2: -`; // Handle case where reading 2 is missing
 
+    if (readings.length > 2) latestReading3Element.textContent = `Sensor Reading 3: ${readings[2]}`;
+     else latestReading3Element.textContent = `Sensor Reading 3: -`; // Handle case where reading 2 is missing
+
      // Add logic for more stats elements
 }
 
@@ -167,11 +172,13 @@ function addDataGridRow(readings) {
     const timestampCell = newRow.insertCell(0);
     const reading1Cell = newRow.insertCell(1);
     const reading2Cell = newRow.insertCell(2);
+    const reading3Cell = newRow.insertCell(3);
     // Add more cells for more sensors
 
     timestampCell.textContent = timestamp;
-    reading1Cell.textContent = readings.length > 0 ? readings[0] : '-';
-    reading2Cell.textContent = readings.length > 1 ? readings[1] : '-';
+    reading1Cell.textContent = readings[0] != null ? readings[0] : '-';
+    reading2Cell.textContent = readings[1] != null ? readings[1] : '-';
+    reading3Cell.textContent = readings[2] != null ? readings[2] : '-';
     // Set textContent for more cells
 
     // Limit the number of rows in the datagrid
