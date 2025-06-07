@@ -41,10 +41,13 @@ socket.onmessage = (event) => {
             // --- Extract Sensor Readings ---
             // Skip the first two elements (headers)
             if (Array.isArray(transportData) && transportData.length >= 3) { // Need at least 3 elements (2 headers + 1 reading)
-                const sensorReading1 = transportData[2];
-                const sensorReading2 = transportData.length > 3 ? transportData[3] : null; // Check if there's a 4th element
-                const sensorReading3 = transportData.length > 4 ? transportData[4] : null; // Check if there's a 4th element
-
+                // const sensorReading1 = transportData[2];
+                // const sensorReading2 = transportData.length > 3 ? transportData[3] : null; // Check if there's a 4th element
+                // const sensorReading3 = transportData.length > 4 ? transportData[4] : null; // Check if there's a 4th element
+                const readings = transportData.slice(2);
+                const [sensorReading1, sensorReading2, sensorReading3] = 
+                [readings.at(-3), readings.at(-2), readings.at(-1)];
+                
                 // --- Update UI ---
                 updateChart([sensorReading1, sensorReading2, sensorReading3]); 
                 updateStats([sensorReading1, sensorReading2, sensorReading3]);
