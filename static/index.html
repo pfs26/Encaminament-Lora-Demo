@@ -1,47 +1,61 @@
 <!DOCTYPE html>
-<html>
+<html lang="ca">
 <head>
-    <title>DEMO - TFG</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Optional: Chart.js annotation plugin if you want specific points highlighted -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.1.1"></script> -->
-    <link rel="stylesheet" href="/static/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DEMO - TFG</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h1>Dades en temps real</h1>
+<body class="bg-gray-100 text-gray-800 p-6">
 
-    <div class="chart-container"> <!-- Add a container div -->
-       <canvas id="myChart"></canvas>
+  <h1 class="text-3xl font-bold mb-6">📡 Dades en temps real</h1>
+
+  <!-- Chart Section -->
+  <div class="bg-white p-4 rounded-lg shadow mb-6 h-96">
+    <canvas id="myChart" class="w-full h-full"></canvas>
+  </div>
+
+  <!-- Latest Stats -->
+  <div class="bg-white p-4 rounded-lg shadow mb-6">
+    <h2 class="text-lg font-semibold mb-2">📊 Últims valors</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+      <p id="latestReading1">Dispositiu 1: -</p>
+      <p id="latestReading2">Dispositiu 2: -</p>
+      <p id="latestReading3">Dispositiu 3: -</p>
     </div>
+  </div>
 
-    <div id="stats">
-        <h3>Últims valors:</h3>
-        <p id="latestReading1">-</p>
-        <p id="latestReading2">-</p>
-        <p id="latestReading3">-</p>
-        <!-- Add more p tags if you have more sensors -->
+  <!-- Network Status -->
+  <div class="bg-white p-4 rounded-lg shadow mb-6">
+    <h2 class="text-lg font-semibold mb-2">📶 Estat dels dispositius</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+      <div><strong>Dispositius actius:</strong> <span id="activeDevices">-</span></div>
+      <div><strong>Estat de la xarxa:</strong> <span id="networkStatus">-</span></div>
     </div>
+  </div>
 
-    <div id="dataGrid">
-        <h3>Log:</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Timestamp</th>
-                    <th>Dispositiu 1</th>
-                    <th>Dispositiu 2</th>
-                    <th>Dispositiu 3</th>
-                    <!-- Add more headers if you have more sensors -->
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Data rows will be added here by JavaScript -->
-            </tbody>
-        </table>
-    </div>
+  <!-- Data Grid -->
+  <div class="bg-white p-4 rounded-lg shadow mb-6 overflow-auto">
+    <h2 class="text-lg font-semibold mb-2">📋 Log</h2>
+    <table class="table-auto w-full text-sm">
+      <thead class="bg-gray-200">
+        <tr>
+          <th class="px-2 py-1 text-left">Timestamp</th>
+          <th class="px-2 py-1 text-left">Dispositiu 1</th>
+          <th class="px-2 py-1 text-left">Dispositiu 2</th>
+          <th class="px-2 py-1 text-left">Dispositiu 3</th>
+        </tr>
+      </thead>
+      <tbody id="dataGridBody">
+        <!-- Filled by JS -->
+      </tbody>
+    </table>
+  </div>
 
-    <pre id="rawData"></pre>
+  <!-- Raw Data (optional debug) -->
+  <pre id="rawData" class="bg-gray-200 p-2 text-xs overflow-auto h-64"></pre>
 
-    <script src="/static/script.js"></script>
+  <script src="/static/script.js"></script>
 </body>
 </html>

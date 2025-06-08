@@ -1,198 +1,125 @@
 const chartCanvas = document.getElementById('myChart').getContext('2d');
 const rawDataElement = document.getElementById('rawData');
-const statsElement = document.getElementById('stats');
 const latestReading1Element = document.getElementById('latestReading1');
-const latestReading2Element = document.getElementById('latestReading2'); // Add more if needed
-const latestReading3Element = document.getElementById('latestReading3'); // Add more if needed
-const dataGridBody = document.querySelector('#dataGrid tbody');
+const latestReading2Element = document.getElementById('latestReading2');
+const latestReading3Element = document.getElementById('latestReading3');
+const dataGridBody = document.getElementById('dataGridBody');
+const activeDevices = document.getElementById('activeDevices');
+const networkStatus = document.getElementById('networkStatus');
 
 let chart;
-const MAX_CHART_DATA_POINTS = 20; // Keep only last N data points on the chart
-const MAX_DATAGRID_ROWS = 50; // Keep only last N rows in the datagrid
+const MAX_CHART_DATA_POINTS = 20;
+const MAX_DATAGRID_ROWS = 50;
 
-// Determine WebSocket protocol based on window location
+// Setup WebSocket
 const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-const wsURL = `${wsProtocol}//${window.location.host}/ws`; // Connect to the /ws endpoint
+const socket = new WebSocket(`${wsProtocol}//${window.location.host}/ws`);
 
-const socket = new WebSocket(wsURL);
-
-socket.onopen = () => {
-    console.log('WebSocket connection established');
-    // socket.send('Hello Server!'); // Optional
-};
+socket.onopen = () => console.log('WebSocket connected');
 
 socket.onmessage = (event) => {
-    try {
-        const data = JSON.parse(event.data);
-        console.log('Data from server:', data);
-        rawDataElement.textContent = JSON.stringify(data, null, 2) + '\n' + rawDataElement.textContent;
+  try {
+    const data = JSON.parse(event.data);
+    rawDataElement.textContent = JSON.stringify(data, null, 2) + '\n' + rawDataElement.textContent;
+    rawDataElement.textContent = rawDataElement.textContent.split('\n').slice(0, 500).join('\n');
 
-        // Limit the raw data log to prevent memory issues
-        const lines = rawDataElement.textContent.split('\n');
-        if (lines.length > 500) { // Keep roughly the last 500 lines
-             rawDataElement.textContent = lines.slice(0, 500).join('\n');
-        }
+    if (data.type === 'ttn_data' && data.payload?.transport?.data) {
+      const transportData = data.payload.transport.data;
+      if (transportData.length >= 2) {
+        const appDataLength = transportData[1];
+        const readings = transportData.slice(2, 2 + appDataLength);
 
+        // Update chart and UI
+        updateChart(readings);
+        updateStats(readings);
+        addDataGridRow(readings);
 
-        if (data.type === 'ttn_data' && data.payload) {
-            const decodedPayload = data.payload;
-            const transportData = decodedPayload?.transport?.data;
-
-            // --- Extract Sensor Readings ---
-            // Skip the first two elements (headers)
-            if (Array.isArray(transportData) && transportData.length >= 3) { // Need at least 3 elements (2 headers + 1 reading)
-                // const sensorReading1 = transportData[2];
-                // const sensorReading2 = transportData.length > 3 ? transportData[3] : null; // Check if there's a 4th element
-                // const sensorReading3 = transportData.length > 4 ? transportData[4] : null; // Check if there's a 4th element
-                const readings = transportData.slice(2);
-                const [sensorReading1, sensorReading2, sensorReading3] = 
-                [readings.at(-3), readings.at(-2), readings.at(-1)];
-                
-                // --- Update UI ---
-                updateChart([sensorReading1, sensorReading2, sensorReading3]); 
-                updateStats([sensorReading1, sensorReading2, sensorReading3]);
-                addDataGridRow([sensorReading1, sensorReading2, sensorReading3]);
-
-            } else {
-                console.warn("Payload does not contain expected transport.data array with enough elements:", decodedPayload);
-            }
-        }
-    } catch (error) {
-        console.error("Error processing WebSocket message:", error);
-        console.error("Message data:", event.data); // Log the raw message data
+        // Update app-layer UI
+        activeDevices.textContent = appDataLength;
+        networkStatus.textContent = getNetworkStatus(appDataLength);
+      }
     }
+  } catch (error) {
+    console.error("WebSocket error:", error);
+  }
 };
 
-socket.onerror = (error) => {
-    console.error('WebSocket Error:', error);
-};
+socket.onclose = () => console.log('WebSocket disconnected');
+socket.onerror = (err) => console.error('WebSocket error:', err);
 
-socket.onclose = () => {
-    console.log('WebSocket connection closed');
-};
-
-// --- Chart.js Initialization ---
+// Chart.js init
 function initializeChart() {
-    chart = new Chart(chartCanvas, {
-        type: 'line',
-        data: {
-            labels: [], // Timestamps or counters
-            datasets: [
-            {
-                label: 'Dispositiu 1',
-                data: [],
-                borderColor: 'rgb(255, 99, 132)',
-                tension: 0.1,
-                fill: false // Don't fill area under the line
-            },
-            {
-                label: 'Dispositiu 2',
-                data: [],
-                borderColor: 'rgb(54, 162, 235)',
-                tension: 0.1,
-                fill: false // Don't fill area under the line
-            },
-            // Add more datasets here for more sensors
-            {
-                label: 'Dispositiu 3',
-                data: [],
-                borderColor: 'rgb(0, 255, 76)',
-                tension: 0.1,
-                fill: false // Don't fill area under the line
-            }
-            ]
-        },
-        options: {
-            responsive: true, // Keep responsive so it resizes with screen width
-            maintainAspectRatio: false, // <--- THIS IS IMPORTANT: Let CSS control height
-            scales: {
-                y: {
-                    beginAtZero: false // Adjust as needed based on expected sensor values
-                },
-                x: {
-                }
-            },
-            plugins: {
-                legend: {
-                    display: true // Show the legend for datasets
-                },
-                // annotation: { // Example if you want to use the annotation plugin
-                //     annotations: {
-                //         // Define annotations here if needed
-                //     }
-                // }
-            }
-        }
-    });
+  chart = new Chart(chartCanvas, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [
+        { label: 'Dispositiu 1', data: [], borderColor: 'rgb(255, 99, 132)', tension: 0.1 },
+        { label: 'Dispositiu 2', data: [], borderColor: 'rgb(54, 162, 235)', tension: 0.1 },
+        { label: 'Dispositiu 3', data: [], borderColor: 'rgb(0, 255, 76)', tension: 0.1 }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: { beginAtZero: false },
+        x: {}
+      },
+      plugins: { legend: { display: true } }
+    }
+  });
 }
 
-// --- Update Chart with New Data ---
+// Chart update
 function updateChart(readings) {
-    if (!chart) initializeChart();
+  if (!chart) initializeChart();
 
-    const now = new Date();
-    // Format label as HH:MM:SS
-    const label = now.toLocaleTimeString(); // Or more detailed: `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`
+  const label = new Date().toLocaleTimeString();
+  chart.data.labels.push(label);
 
-    chart.data.labels.push(label);
+  if (readings.length > 0) chart.data.datasets[0].data.push(readings[0]);
+  if (readings.length > 1) chart.data.datasets[1].data.push(readings[1]);
+  if (readings.length > 2) chart.data.datasets[2].data.push(readings[2]);
 
-    // Add readings to respective datasets
-    if (readings.length > 0) chart.data.datasets[0].data.push(readings[0]);
-    if (readings.length > 1) chart.data.datasets[1].data.push(readings[1]);
-    // Add logic for more datasets if needed
-    if (readings.length > 2) chart.data.datasets[2].data.push(readings[2]);
+  if (chart.data.labels.length > MAX_CHART_DATA_POINTS) {
+    chart.data.labels.shift();
+    chart.data.datasets.forEach(dataset => dataset.data.shift());
+  }
 
-    // Limit the number of data points on the chart
-    if (chart.data.labels.length > MAX_CHART_DATA_POINTS) {
-        chart.data.labels.shift(); // Remove oldest label
-        chart.data.datasets.forEach(dataset => dataset.data.shift()); // Remove oldest data point from each dataset
-    }
-    chart.update(); // Update the chart display
+  chart.update();
 }
 
-// --- Update Latest Stats ---
+// Update latest stats
 function updateStats(readings) {
-     if (readings.length > 0) latestReading1Element.textContent = `Dispositiu 1: ${readings[0]}`;
-     else latestReading1Element.textContent = `Dispositiu 1: -`; // Handle case where reading 1 is missing
-
-     if (readings.length > 1) latestReading2Element.textContent = `Dispositiu 2: ${readings[1]}`;
-     else latestReading2Element.textContent = `Dispositiu 2: -`; // Handle case where reading 2 is missing
-
-    if (readings.length > 2) latestReading3Element.textContent = `Dispositiu 3: ${readings[2]}`;
-     else latestReading3Element.textContent = `Dispositiu 3: -`; // Handle case where reading 2 is missing
-
-     // Add logic for more stats elements
+  latestReading1Element.textContent = `Dispositiu 1: ${readings[0] ?? '-'}`;
+  latestReading2Element.textContent = `Dispositiu 2: ${readings[1] ?? '-'}`;
+  latestReading3Element.textContent = `Dispositiu 3: ${readings[2] ?? '-'}`;
 }
 
-
-// --- Add Row to Data Grid ---
+// Add row to datagrid
 function addDataGridRow(readings) {
-    const now = new Date();
-    const timestamp = now.toLocaleString(); // Format timestamp nicely
+  const row = dataGridBody.insertRow(0);
+  row.insertCell(0).textContent = new Date().toLocaleString();
+  row.insertCell(1).textContent = readings[0] ?? '-';
+  row.insertCell(2).textContent = readings[1] ?? '-';
+  row.insertCell(3).textContent = readings[2] ?? '-';
 
-    const newRow = dataGridBody.insertRow(0); // Insert at the top (most recent first)
-
-    const timestampCell = newRow.insertCell(0);
-    const reading1Cell = newRow.insertCell(1);
-    const reading2Cell = newRow.insertCell(2);
-    const reading3Cell = newRow.insertCell(3);
-    // Add more cells for more sensors
-
-    timestampCell.textContent = timestamp;
-    reading1Cell.textContent = readings[0] != null ? readings[0] : '-';
-    reading2Cell.textContent = readings[1] != null ? readings[1] : '-';
-    reading3Cell.textContent = readings[2] != null ? readings[2] : '-';
-    // Set textContent for more cells
-
-    // Limit the number of rows in the datagrid
-    while (dataGridBody.rows.length > MAX_DATAGRID_ROWS) {
-        dataGridBody.deleteRow(dataGridBody.rows.length - 1); // Remove the last row
-    }
+  while (dataGridBody.rows.length > MAX_DATAGRID_ROWS) {
+    dataGridBody.deleteRow(-1);
+  }
 }
 
+// Network status based on appDataLength
+function getNetworkStatus(count) {
+  switch (count) {
+    case 3: return '✅ Tots els dispositius funcionen';
+    case 2: return '⚠️ Error entre Dispositiu 2 i 3';
+    case 1: return '⚠️ Error entre Dispositiu 1 i 2';
+    default: return '❌ Cap dispositiu actiu';
+  }
+}
 
-// --- Initialize chart on load ---
 window.onload = () => {
-    initializeChart();
-    // Optionally, fetch some initial data if you have a history endpoint
+  initializeChart();
 };
