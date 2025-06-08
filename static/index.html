@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>TFG Live Chart</title>
+    <title>DEMO - TFG</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Optional: Chart.js annotation plugin if you want specific points highlighted -->
     <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.1.1"></script> -->
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <h1>Live Data from TTN</h1>
+    <h1>Dades en temps real</h1>
 
     <div class="chart-container"> <!-- Add a container div -->
        <canvas id="myChart"></canvas>
     </div>
 
     <div id="stats">
-        <h3>Latest Stats:</h3>
+        <h3>Últims valors:</h3>
         <p id="latestReading1">-</p>
         <p id="latestReading2">-</p>
         <p id="latestReading3">-</p>
@@ -23,14 +23,14 @@
     </div>
 
     <div id="dataGrid">
-        <h3>Data Log:</h3>
+        <h3>Log:</h3>
         <table>
             <thead>
                 <tr>
                     <th>Timestamp</th>
-                    <th>Reading 1</th>
-                    <th>Reading 2</th>
-                    <th>Reading 3</th>
+                    <th>Dispositiu 1</th>
+                    <th>Dispositiu 2</th>
+                    <th>Dispositiu 3</th>
                     <!-- Add more headers if you have more sensors -->
                 </tr>
             </thead>

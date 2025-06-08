@@ -79,14 +79,14 @@ function initializeChart() {
             labels: [], // Timestamps or counters
             datasets: [
             {
-                label: 'Sensor Reading 1',
+                label: 'Dispositiu 1',
                 data: [],
                 borderColor: 'rgb(255, 99, 132)',
                 tension: 0.1,
                 fill: false // Don't fill area under the line
             },
             {
-                label: 'Sensor Reading 2',
+                label: 'Dispositiu 2',
                 data: [],
                 borderColor: 'rgb(54, 162, 235)',
                 tension: 0.1,
@@ -94,7 +94,7 @@ function initializeChart() {
             },
             // Add more datasets here for more sensors
             {
-                label: 'Sensor Reading 3',
+                label: 'Dispositiu 3',
                 data: [],
                 borderColor: 'rgb(0, 255, 76)',
                 tension: 0.1,
@@ -152,14 +152,14 @@ function updateChart(readings) {
 
 // --- Update Latest Stats ---
 function updateStats(readings) {
-     if (readings.length > 0) latestReading1Element.textContent = `Sensor Reading 1: ${readings[0]}`;
-     else latestReading1Element.textContent = `Sensor Reading 1: -`; // Handle case where reading 1 is missing
+     if (readings.length > 0) latestReading1Element.textContent = `Dispositiu 1: ${readings[0]}`;
+     else latestReading1Element.textContent = `Dispositiu 1: -`; // Handle case where reading 1 is missing
 
-     if (readings.length > 1) latestReading2Element.textContent = `Sensor Reading 2: ${readings[1]}`;
-     else latestReading2Element.textContent = `Sensor Reading 2: -`; // Handle case where reading 2 is missing
+     if (readings.length > 1) latestReading2Element.textContent = `Dispositiu 2: ${readings[1]}`;
+     else latestReading2Element.textContent = `Dispositiu 2: -`; // Handle case where reading 2 is missing
 
-    if (readings.length > 2) latestReading3Element.textContent = `Sensor Reading 3: ${readings[2]}`;
-     else latestReading3Element.textContent = `Sensor Reading 3: -`; // Handle case where reading 2 is missing
+    if (readings.length > 2) latestReading3Element.textContent = `Dispositiu 3: ${readings[2]}`;
+     else latestReading3Element.textContent = `Dispositiu 3: -`; // Handle case where reading 2 is missing
 
      // Add logic for more stats elements
 }
