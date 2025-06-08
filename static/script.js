@@ -27,12 +27,12 @@ socket.onmessage = (event) => {
       const transportData = data.payload.transport.data;
       if (transportData.length >= 2) {
         const appDataLength = transportData[1];
-        const readings = transportData.slice(2, 2 + appDataLength);
+        const readings = transportData.slice(2);
+        const [sensorReading1, sensorReading2, sensorReading3] = [readings.at(-3), readings.at(-2), readings.at(-1)];
 
-        // Update chart and UI
-        updateChart(readings);
-        updateStats(readings);
-        addDataGridRow(readings);
+        updateChart([sensorReading1, sensorReading2, sensorReading3]); 
+        updateStats([sensorReading1, sensorReading2, sensorReading3]);
+        addDataGridRow([sensorReading1, sensorReading2, sensorReading3]);
 
         // Update app-layer UI
         activeDevices.textContent = appDataLength;
@@ -113,10 +113,10 @@ function addDataGridRow(readings) {
 // Network status based on appDataLength
 function getNetworkStatus(count) {
   switch (count) {
-    case 3: return '✅ Tots els dispositius funcionen';
-    case 2: return '⚠️ Error entre Dispositiu 2 i 3';
-    case 1: return '⚠️ Error entre Dispositiu 1 i 2';
-    default: return '❌ Cap dispositiu actiu';
+    case 3: return 'Tots els dispositius funcionen';
+    case 2: return 'Error entre Dispositiu 2 i 3';
+    case 1: return 'Error entre Dispositiu 1 i 2';
+    default: return 'Cap dispositiu actiu';
   }
 }
 
